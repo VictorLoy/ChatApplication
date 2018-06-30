@@ -19,6 +19,8 @@ import java.net.UnknownHostException;
  * @author victor
  */
 public class Client {
+
+    private User theUser;
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
@@ -26,6 +28,10 @@ public class Client {
     
     public Client(String word){
         toBeSent=word;
+        
+    }
+    public void setUser(String name,String email){
+        theUser=new User(name,email);
     }
     public void connect(int port){
         
@@ -35,9 +41,13 @@ public class Client {
             socket=new Socket(add.getHostName(),port);
             
             System.out.println("Just connected to " + socket.getRemoteSocketAddress());
-            OutputStream outToServer = socket.getOutputStream();
-            DataOutputStream out = new DataOutputStream(outToServer);
-            out.writeUTF(toBeSent);
+            theUser.setDataStream(socket);
+            
+//            OutputStream outToServer = socket.getOutputStream();
+//            DataOutputStream out = new DataOutputStream(outToServer);
+//            out.writeUTF(toBeSent);
+            theUser.sendString(toBeSent);
+            
             
         }catch(UnknownHostException e){
             System.out.println("Unknown host");
@@ -47,6 +57,11 @@ public class Client {
             ex.printStackTrace();
         }
     }
+    
+    
+        public void getMessage(){
+            System.out.println(theUser.getMessage());
+        }
     
     
     

@@ -22,11 +22,17 @@ public class ChatAppliaction {
         int port=101;
         ChatServer cs=new ChatServer(101);
         Client c1=new Client("Hello");
+        c1.setUser("Victor", "adeddunloyinmi@gmail.com");
         Client c2=new Client("What's Up");
+        c2.setUser("Adeodun", "victorloyinmi@gmail.com");
         c2.connect(port);
         c1.connect(port);
         
+        
+        
         cs.run();
+        c1.getMessage();
+        c2.getMessage();
         
         
         
