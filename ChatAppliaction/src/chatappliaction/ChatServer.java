@@ -7,59 +7,36 @@ package chatappliaction;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  *
  * @author victor
  */
-public class ChatServer extends Thread {
-    private ServerSocket sock;
-    private int portNumber;
-    
-    public ChatServer(int num){
-        portNumber=num;
-        try{
-        sock=new ServerSocket(portNumber);
-        System.out.println("Succesfully Connected to port "+portNumber);
+public class ChatServer{
+  
+    private static final int PORT = 101;
+
+    static HashSet<String> names = new HashSet<String>();
+
+    static HashSet<PrintWriter> writers = new HashSet<PrintWriter>();
+
+    public static void main(String[] args) throws Exception {
+        System.out.println("The chat server is running.");
+        ServerSocket listener = new ServerSocket(PORT);
+        InetAddress inetAddress = InetAddress. getLocalHost();
+        System.out.println("IP Address:- " + inetAddress. getHostAddress());
+        try {
+            while (true) {
+                new ServerHandler(listener.accept()).start();
+            }
+        } finally {
+            listener.close();
         }
-        catch(IOException e){
-            System.out.println("Could not listen on port "+ portNumber);
-        }
+
     }
-    public void run(){
-        try{
-            System.out.print("Running the server at port "+portNumber);
-            System.out.println("Waiting for client on port " + 
-               sock.getLocalPort() + "...");
-            Socket server = sock.accept();
-            Socket server1 = sock.accept();
-            
-            
-            System.out.println("Just connected to " + server.getRemoteSocketAddress());
-            System.out.println("Just connected to " + server1.getRemoteSocketAddress());
-            
-            DataInputStream in = new DataInputStream(server.getInputStream());
-            DataInputStream in1 = new DataInputStream(server1.getInputStream());
-            
-            System.out.println(in.readUTF()+"::::This is what was sent");
-            DataOutputStream out = new DataOutputStream(server.getOutputStream());
-            out.writeUTF("Thank you for connecting to " + server.getLocalSocketAddress()
-               + "\nGoodbye!");
-            server.close();
-            
-            System.out.println(in1.readUTF()+"::::This is what was sent");
-            DataOutputStream out1 = new DataOutputStream(server1.getOutputStream());
-            out1.writeUTF("Thank you for connecting to " + server.getLocalSocketAddress()
-               + "\nGoodbye!");
-            server1.close();
-            
-        }catch (SocketTimeoutException s) {
-            System.out.println("Socket timed out!");
-            
-         } catch (IOException e) {
-            e.printStackTrace();
-            
-         }
-    }
-    
 }
+        
+    
+

@@ -5,14 +5,22 @@
  */
 package chatappliaction;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 /**
  *
@@ -20,49 +28,92 @@ import java.net.UnknownHostException;
  */
 public class Client {
 
-    private User theUser;
-    private Socket socket;
-    private BufferedReader in;
-    private PrintWriter out;
-    private String toBeSent;
-    
-    public Client(String word){
-        toBeSent=word;
-        
+    BufferedReader in;
+    PrintWriter out;
+    JFrame frame = new JFrame("Chatter");
+    JTextField textField = new JTextField(40);
+    JTextArea messageArea = new JTextArea(8, 40);
+
+    /**
+     * Constructs the client by laying out the GUI and registering a
+     * listener with the textfield so that pressing Return in the
+     * listener sends the textfield contents to the server.  Note
+     * however that the textfield is initially NOT editable, and
+     * only becomes editable AFTER the client receives the NAMEACCEPTED
+     * message from the server.
+     */
+    public Client() {
+
+        // Layout GUI
+        textField.setEditable(false);
+        messageArea.setEditable(false);
+        frame.getContentPane().add(textField, "South");
+        frame.getContentPane().add(new JScrollPane(messageArea), "Center");
+        frame.pack();
+
+        // Add Listeners
+        textField.addActionListener(new ActionListener() {
+            /**
+             * Responds to pressing the enter key in the textfield by sending
+             * the contents of the text field to the server.    Then clear
+             * the text area in preparation for the next message.
+             */
+            public void actionPerformed(ActionEvent e) {
+                out.println(textField.getText());
+                textField.setText("");
+            }
+        });
     }
-    public void setUser(String name,String email){
-        theUser=new User(name,email);
+
+    /**
+     * Prompt for and return the address of the server.
+     */
+    private String getServerAddress() {
+        return JOptionPane.showInputDialog(
+            frame,
+            "Enter IP Address of the Server:",
+            "Welcome to the Chatter",
+            JOptionPane.QUESTION_MESSAGE);
     }
-    public void connect(int port){
-        
-        try{
-            InetAddress add;
-            add=InetAddress.getLocalHost();
-            socket=new Socket(add.getHostName(),port);
-            
-            System.out.println("Just connected to " + socket.getRemoteSocketAddress());
-            theUser.setDataStream(socket);
-            
-//            OutputStream outToServer = socket.getOutputStream();
-//            DataOutputStream out = new DataOutputStream(outToServer);
-//            out.writeUTF(toBeSent);
-            theUser.sendString(toBeSent);
-            
-            
-        }catch(UnknownHostException e){
-            System.out.println("Unknown host");
-            e.printStackTrace();
-        }
-        catch(IOException ex){
-            ex.printStackTrace();
+
+    /**
+     * Prompt for and return the desired screen name.
+     */
+    private String getName() {
+        return JOptionPane.showInputDialog(
+            frame,
+            "Choose a screen name:",
+            "Screen name selection",
+            JOptionPane.PLAIN_MESSAGE);
+    }
+
+    /**
+     * Connects to the server then enters the processing loop.
+     */
+    public void run() throws IOException {
+
+        // Make connection and initialize streams
+        String serverAddress = getServerAddress();
+        Socket socket = new Socket(serverAddress, 101);
+        in = new BufferedReader(new InputStreamReader(
+            socket.getInputStream()));
+        out = new PrintWriter(socket.getOutputStream(), true);
+
+        // Process all messages from server, according to the protocol.
+        while (true) {
+            String line = in.readLine();
+            if (line.startsWith("SUBMITNAME")) {
+                out.println(getName());
+            } else if (line.startsWith("NAMEACCEPTED")) {
+                textField.setEditable(true);
+            } else if (line.startsWith("MESSAGE")) {
+                messageArea.append(line.substring(8) + "\n");
+            }
         }
     }
+
+    /**
+     * Runs the client as an application with a closeable frame.
+     */
+    }
     
-    
-        public void getMessage(){
-            System.out.println(theUser.getMessage());
-        }
-    
-    
-    
-}

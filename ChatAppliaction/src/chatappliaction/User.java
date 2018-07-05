@@ -60,5 +60,11 @@ public class User {
         String str="ERROR: COULD NOT RECEIVE MESSAGE";
         return str;
     }
+    public String getName(){
+        return firstName;
+    }
+    public String getemail(){
+        return email;
+    }
     
 }

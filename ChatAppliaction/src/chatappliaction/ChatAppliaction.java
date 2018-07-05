@@ -6,6 +6,7 @@
 package chatappliaction;
 
 import java.net.*;
+import javax.swing.JFrame;
 
 /**
  *
@@ -16,26 +17,12 @@ public class ChatAppliaction {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
-        // TODO code application logic here
-        //This is the testing for chat server 
-        int port=101;
-        ChatServer cs=new ChatServer(101);
-        Client c1=new Client("Hello");
-        c1.setUser("Victor", "adeddunloyinmi@gmail.com");
-        Client c2=new Client("What's Up");
-        c2.setUser("Adeodun", "victorloyinmi@gmail.com");
-        c2.connect(port);
-        c1.connect(port);
-        
-        
-        
-        cs.run();
-        c1.getMessage();
-        c2.getMessage();
-        
-        
-        
+    public static void main(String[] args) throws Exception {
+        Client client = new Client();
+        client.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        client.frame.setVisible(true);
+        client.run();
     }
+
     
 }
