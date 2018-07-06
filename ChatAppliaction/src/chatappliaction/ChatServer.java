@@ -16,7 +16,7 @@ import java.util.HashSet;
  */
 public class ChatServer{
   
-    private static final int PORT = 101;
+    private static final int PORT = 1001;
 
     static HashSet<String> names = new HashSet<String>();
 

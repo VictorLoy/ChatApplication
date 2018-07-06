@@ -9,6 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -16,6 +18,9 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Scanner;
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -27,7 +32,9 @@ import javax.swing.JTextField;
  * @author victor
  */
 public class Client {
-
+    private String ipAdd, name, email;
+    
+    
     BufferedReader in;
     PrintWriter out;
     JFrame frame = new JFrame("Chatter");
@@ -59,8 +66,10 @@ public class Client {
              * the text area in preparation for the next message.
              */
             public void actionPerformed(ActionEvent e) {
+   
                 out.println(textField.getText());
                 textField.setText("");
+                
             }
         });
     }
@@ -72,6 +81,13 @@ public class Client {
         return JOptionPane.showInputDialog(
             frame,
             "Enter IP Address of the Server:",
+            "Welcome to the Chatter",
+            JOptionPane.QUESTION_MESSAGE);
+    }
+    private String getEmail(){
+        return JOptionPane.showInputDialog(
+            frame,
+            "Enter your email:",
             "Welcome to the Chatter",
             JOptionPane.QUESTION_MESSAGE);
     }
@@ -93,8 +109,17 @@ public class Client {
     public void run() throws IOException {
 
         // Make connection and initialize streams
-        String serverAddress = getServerAddress();
-        Socket socket = new Socket(serverAddress, 101);
+        String serverAddress="";
+        if(checkFile("profile.txt")){
+                readProfile();
+                serverAddress=ipAdd;   
+            }else{
+                serverAddress = getServerAddress();
+                email=getEmail();
+                ipAdd=serverAddress;
+            }
+        
+        Socket socket = new Socket(serverAddress, 1001);
         in = new BufferedReader(new InputStreamReader(
             socket.getInputStream()));
         out = new PrintWriter(socket.getOutputStream(), true);
@@ -103,12 +128,56 @@ public class Client {
         while (true) {
             String line = in.readLine();
             if (line.startsWith("SUBMITNAME")) {
-                out.println(getName());
+                if(checkFile("profile.txt")){
+                    readProfile();
+                   out.println(name); 
+                }else{
+                    name=getName();
+                    out.println(name);
+                }
+                
             } else if (line.startsWith("NAMEACCEPTED")) {
                 textField.setEditable(true);
             } else if (line.startsWith("MESSAGE")) {
+              
                 messageArea.append(line.substring(8) + "\n");
+		  
             }
+            writeProfile();
+        }
+        
+    }
+    public boolean checkFile(String fileName){
+        File f = new File(fileName);
+        if(f.exists() && !f.isDirectory()) { 
+        return true;
+        }
+        return false;
+    }
+    public void readProfile(){
+        
+        File inputFile=new File("profile.txt");//Put the fiel name here
+        try{
+        Scanner in= new Scanner(inputFile);
+        ipAdd=in.nextLine();
+        name=in.nextLine();
+        email=in.nextLine();
+        in.close();
+        }catch(FileNotFoundException ex){
+            System.out.println("File not found");
+        }
+    }
+    public void writeProfile(){
+        File outputFile=new File("profile.txt");
+        try{
+        PrintWriter fileOut=new PrintWriter(outputFile);
+        fileOut.println(ipAdd);
+        fileOut.println(name);
+        fileOut.println(email);
+        fileOut.close();
+        
+        }catch(FileNotFoundException ex){
+            System.out.println("File not found");
         }
     }
 
