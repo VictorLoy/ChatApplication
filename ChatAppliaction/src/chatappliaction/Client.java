@@ -8,19 +8,13 @@ package chatappliaction;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.Scanner;
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -43,11 +37,8 @@ public class Client {
 
     /**
      * Constructs the client by laying out the GUI and registering a
-     * listener with the textfield so that pressing Return in the
-     * listener sends the textfield contents to the server.  Note
-     * however that the textfield is initially NOT editable, and
-     * only becomes editable AFTER the client receives the NAMEACCEPTED
-     * message from the server.
+     * user with the textfield so that pressing Return in the
+     * listener sends the textfield contents to the server.  
      */
     public Client() {
 
