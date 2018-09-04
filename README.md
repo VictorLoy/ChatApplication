@@ -7,6 +7,6 @@ How to run the server
 How to run the Chat Application    
 - Open the .jar file of either the ChatApp or the the Chat Application    
 - Input the ip address of the server you want to connect to    
-- Type your scrren name and email address   
+- Type your screen name and email address   
 
                         
